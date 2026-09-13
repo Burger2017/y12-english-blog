@@ -20,6 +20,7 @@
             text-decoration: none;
             color: #2b6cb0;
             font-weight: 600;
+            font-size: 1.1rem;
         }
         .nav-link:hover {
             text-decoration: underline;
@@ -46,16 +47,16 @@
 </head>
 <body>
 
-    <!-- Back to Main Hub Navigation Button -->
-    <a href="index.html" class="nav-link">← Back to Main Hub</a>
+    <!-- Back Link (Absolute path targeting your GitHub Pages root) -->
+    <a href="/y12-english-blog/index.html" class="nav-link">← Back to Main Hub</a>
 
-    <!-- Main Content Wrapper -->
+    <!-- Main Content Area -->
     <main id="essay-content">
         <h1 id="essay-title">Loading...</h1>
-        <div id="essay-body">Select or create an essay to view content.</div>
+        <div id="essay-body">Fetching content from database...</div>
     </main>
 
-    <!-- Floating Live Controls -->
+    <!-- Floating Buttons -->
     <div class="controls">
         <button onclick="enableEditing()" style="background: #1a202c;">✏️ Edit</button>
         <button onclick="saveEssay()" style="background: #2b6cb0;">💾 Save Live</button>
@@ -67,11 +68,11 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0YXlqdnRxcG9hcGd4eGhoaXdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDUwNDYsImV4cCI6MjEwNDg4MTA0Nn0.NvUJ3n-9dRIuNEriKa0YTNp3sZA9YTScxQrksfEchCI';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Extracts the unique topic ID from the URL string
+        // Get the essay topic ID from the URL (e.g. ?id=history_of_fashion)
         const urlParams = new URLSearchParams(window.location.search);
         const ESSAY_ID = urlParams.get('id') || 'default_essay';
 
-        // Load dynamic data on browser initialization
+        // Load content on startup
         window.addEventListener('DOMContentLoaded', async () => {
             const { data } = await supabaseClient
                 .from('portfolio_data')
@@ -82,11 +83,11 @@
             if (data && data.content) {
                 document.getElementById('essay-content').innerHTML = data.content;
             } else {
-                document.getElementById('essay-content').innerHTML = `<h1>New Page (${ESSAY_ID})</h1><p>Click Edit to write content here...</p>`;
+                document.getElementById('essay-content').innerHTML = `<h1>New Page (${ESSAY_ID})</h1><p>Click Edit to add content to this essay...</p>`;
             }
         });
 
-        // Unlocks client-side inline editing
+        // Enable live editing in browser
         function enableEditing() {
             if (prompt("Enter password:") !== CONFIG.password) return alert("Incorrect password");
             const area = document.getElementById('essay-content');
@@ -96,7 +97,7 @@
             area.style.borderRadius = "6px";
         }
 
-        // Writes changes dynamically to Supabase
+        // Save live changes to Supabase
         async function saveEssay() {
             const area = document.getElementById('essay-content');
             area.removeAttribute('contenteditable');
@@ -110,7 +111,7 @@
             if (error) {
                 alert("Error saving: " + error.message);
             } else {
-                alert("Saved live! This essay is now synced across all devices.");
+                alert("Saved live! Content updated across all devices.");
             }
         }
     </script>
