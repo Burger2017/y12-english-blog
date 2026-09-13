@@ -22,12 +22,8 @@
             font-weight: 600;
             font-size: 1.1rem;
         }
-        .nav-link:hover {
-            text-decoration: underline;
-        }
-        #essay-content { 
-            min-height: 200px; 
-        }
+        .nav-link:hover { text-decoration: underline; }
+        #essay-content { min-height: 200px; }
         .controls { 
             position: fixed; 
             bottom: 20px; 
@@ -47,16 +43,13 @@
 </head>
 <body>
 
-    <!-- Back to Hub Navigation Link -->
     <a href="index.html" class="nav-link">← Back to Main Hub</a>
 
-    <!-- Main Content Area -->
     <main id="essay-content">
         <h1 id="essay-title">Loading...</h1>
         <div id="essay-body">Fetching content...</div>
     </main>
 
-    <!-- Floating Edit Buttons -->
     <div class="controls">
         <button onclick="enableEditing()" style="background: #1a202c;">✏️ Edit</button>
         <button onclick="saveEssay()" style="background: #2b6cb0;">💾 Save Live</button>
@@ -68,11 +61,9 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0YXlqdnRxcG9hcGd4eGhoaXdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDUwNDYsImV4cCI6MjEwNDg4MTA0Nn0.NvUJ3n-9dRIuNEriKa0YTNp3sZA9YTScxQrksfEchCI';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Get unique ID from URL query string
         const urlParams = new URLSearchParams(window.location.search);
         const ESSAY_ID = urlParams.get('id') || 'default_essay';
 
-        // Load essay content from Supabase database
         window.addEventListener('DOMContentLoaded', async () => {
             const { data } = await supabaseClient
                 .from('portfolio_data')
@@ -83,9 +74,8 @@
             if (data && data.content) {
                 document.getElementById('essay-content').innerHTML = data.content;
             } else {
-                // Formatting for blank new pages
-                const formattedTitle = ESSAY_ID.replace(/_/g, ' ').toUpperCase();
-                document.getElementById('essay-content').innerHTML = `<h1>${formattedTitle}</h1><p>This page is currently empty. Click Edit to write your content here...</p>`;
+                const titleText = ESSAY_ID.replace(/_/g, ' ').toUpperCase();
+                document.getElementById('essay-content').innerHTML = `<h1>${titleText}</h1><p>Click Edit to write content for this post...</p>`;
             }
         });
 
@@ -111,7 +101,7 @@
             if (error) {
                 alert("Error saving: " + error.message);
             } else {
-                alert("Saved live!");
+                alert("Saved live! This post will now automatically show on the main hub.");
             }
         }
     </script>
