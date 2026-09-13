@@ -119,6 +119,42 @@
         makeEditable(newP);
     }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+    const CONFIG = { password: 'englishlanguage123' };
+    const SUPABASE_URL = 'https://ltayjvtqpoapgxxhhiwm.supabase.co'; 
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0YXlqdnRxcG9hcGd4eGhoaXdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDUwNDYsImV4cCI6MjEwNDg4MTA0Nn0.NvUJ3n-9dRIuNEriKa0YTNp3sZA9YTScxQrksfEchCI';
+    
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Give each essay a unique ID in your database!
+    const ESSAY_ID = 'essay_history_of_fashion'; 
 
+    // Fetch saved text on load
+    window.addEventListener('DOMContentLoaded', async () => {
+        const { data } = await supabaseClient
+            .from('portfolio_data')
+            .select('content')
+            .eq('id', ESSAY_ID)
+            .maybeSingle();
+
+        if (data && data.content) {
+            document.getElementById('essay-content').innerHTML = data.content;
+        }
+    });
+
+    // Save edited text back to Supabase
+    async function saveEssay() {
+        const password = prompt("Enter password to save:");
+        if (password !== CONFIG.password) return alert("Incorrect password");
+
+        const contentHTML = document.getElementById('essay-content').innerHTML;
+        const { error } = await supabaseClient
+            .from('portfolio_data')
+            .upsert({ id: ESSAY_ID, content: contentHTML });
+
+        if (error) alert("Error: " + error.message);
+        else alert("Essay saved live to database!");
+    }
+</script>
 </body>
 </html>
