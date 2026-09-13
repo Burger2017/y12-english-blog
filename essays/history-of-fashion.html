@@ -2,159 +2,72 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The History of Fashion - Essay</title>
-    <link rel="stylesheet" href="../style.css">
+    <title>The History of Fashion</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
-<div class="essay-container">
-    <a href="../index.html" class="back-btn">← Back to Homepage</a>
+    <!-- Editable Content Wrapper -->
+    <main id="essay-content">
+        <h1>The History of Fashion</h1>
+        <p>Type your essay content here...</p>
+    </main>
 
-    <header class="essay-header">
-        <span class="genre-tag informative">Informative Essay</span>
-        <h1 class="essay-title" id="essay-title">The History of Fashion: Brief desc</h1>
-        <p class="essay-meta" id="essay-meta">Published by J • Week 1</p>
-    </header>
+    <!-- Save Controls -->
+    <div style="position: fixed; bottom: 20px; right: 20px;">
+        <button onclick="enableEssayEditing()" style="padding: 10px 15px; background: #1a202c; color: white; border: none; border-radius: 5px; cursor: pointer;">✏️ Edit</button>
+        <button onclick="saveEssay()" style="padding: 10px 15px; background: #2b6cb0; color: white; border: none; border-radius: 5px; cursor: pointer;">💾 Save Live</button>
+    </div>
 
-    <!-- Writing Start -->
-    <article class="essay-content" id="essay-body">
-        <p>Insert yap here</p>
-        <p>Paragraph 2</p>
-        <p>A third paragraph.</p>
-    </article>
-    <!-- Writing End -->
-</div>
-
-<!-- Floating Controls -->
-<div id="editor-controls" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; gap: 10px;">
-    <button id="edit-btn" onclick="toggleEditMode()" style="padding: 12px 20px; background: #1a202c; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-        ✏️ Local Edit Preview
-    </button>
-    <button id="add-p-btn" onclick="addParagraph()" style="display: none; padding: 12px 20px; background: #2b6cb0; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-        ➕ Add Paragraph
-    </button>
-</div>
-
-<script>
-    const CONFIG = { password: 'englishlanguage123' };
-    const PAGE_KEY = 'saved_essay_history_of_fashion';
-    let isAuthenticated = false;
-
-    // Load saved content automatically when page opens
-    window.addEventListener('DOMContentLoaded', () => {
-        const savedData = localStorage.getItem(PAGE_KEY);
-        if (savedData) {
-            const parsed = JSON.parse(savedData);
-            document.getElementById('essay-title').innerText = parsed.title;
-            document.getElementById('essay-meta').innerText = parsed.meta;
-            document.getElementById('essay-body').innerHTML = parsed.body;
-        }
-    });
-
-    function toggleEditMode() {
-        if (!isAuthenticated) {
-            const input = prompt("Enter password:");
-            if (input === CONFIG.password) {
-                isAuthenticated = true;
-                enableEditing();
-            } else {
-                alert("Incorrect password.");
-            }
-        } else {
-            saveAndDisableEditing();
-        }
-    }
-
-    function enableEditing() {
-        document.querySelectorAll('.essay-title, .essay-meta, .essay-content p').forEach(makeEditable);
+    <script>
+        const CONFIG = { password: 'englishlanguage123' };
+        const SUPABASE_URL = 'https://ltayjvtqpoapgxxhhiwm.supabase.co'; 
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0YXlqdnRxcG9hcGd4eGhoaXdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDUwNDYsImV4cCI6MjEwNDg4MTA0Nn0.NvUJ3n-9dRIuNEriKa0YTNp3sZA9YTScxQrksfEchCI';
         
-        const btn = document.getElementById('edit-btn');
-        btn.innerText = "💾 Save & Exit";
-        btn.style.backgroundColor = "#2b6cb0";
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const ESSAY_ID = 'essay_history_of_fashion'; 
 
-        document.getElementById('add-p-btn').style.display = "inline-block";
-    }
+        // 1. Fetch live data from Supabase on load
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data } = await supabaseClient
+                .from('portfolio_data')
+                .select('content')
+                .eq('id', ESSAY_ID)
+                .maybeSingle();
 
-    function saveAndDisableEditing() {
-        // Remove editable styles
-        document.querySelectorAll('[contenteditable]').forEach(el => {
-            el.removeAttribute('contenteditable');
-            el.style.outline = "";
-            el.style.padding = "";
-            el.style.backgroundColor = "";
+            if (data && data.content) {
+                document.getElementById('essay-content').innerHTML = data.content;
+            }
         });
 
-        // Save current HTML structure to browser memory
-        const dataToSave = {
-            title: document.getElementById('essay-title').innerText,
-            meta: document.getElementById('essay-meta').innerText,
-            body: document.getElementById('essay-body').innerHTML
-        };
-        localStorage.setItem(PAGE_KEY, JSON.stringify(dataToSave));
-
-        const btn = document.getElementById('edit-btn');
-        btn.innerText = "✏️ Local Edit Preview";
-        btn.style.backgroundColor = "#1a202c";
-
-        document.getElementById('add-p-btn').style.display = "none";
-        isAuthenticated = false;
-    }
-
-    function makeEditable(el) {
-        el.contentEditable = "true";
-        el.style.outline = "2px dashed #2b6cb0";
-        el.style.padding = "4px";
-        el.style.backgroundColor = "#fffde7";
-    }
-
-    function addParagraph() {
-        if (!isAuthenticated) return;
-        
-        const container = document.getElementById('essay-body');
-        const newP = document.createElement('p');
-        newP.innerText = "Type your new paragraph content here...";
-        
-        container.appendChild(newP);
-        makeEditable(newP);
-    }
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script>
-    const CONFIG = { password: 'englishlanguage123' };
-    const SUPABASE_URL = 'https://ltayjvtqpoapgxxhhiwm.supabase.co'; 
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0YXlqdnRxcG9hcGd4eGhoaXdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDUwNDYsImV4cCI6MjEwNDg4MTA0Nn0.NvUJ3n-9dRIuNEriKa0YTNp3sZA9YTScxQrksfEchCI';
-    
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    // Give each essay a unique ID in your database!
-    const ESSAY_ID = 'essay_history_of_fashion'; 
-
-    // Fetch saved text on load
-    window.addEventListener('DOMContentLoaded', async () => {
-        const { data } = await supabaseClient
-            .from('portfolio_data')
-            .select('content')
-            .eq('id', ESSAY_ID)
-            .maybeSingle();
-
-        if (data && data.content) {
-            document.getElementById('essay-content').innerHTML = data.content;
+        // 2. Enable editing in the browser
+        function enableEssayEditing() {
+            const pwd = prompt("Enter password:");
+            if (pwd !== CONFIG.password) return alert("Incorrect password");
+            
+            const area = document.getElementById('essay-content');
+            area.contentEditable = "true";
+            area.style.outline = "2px dashed #2b6cb0";
+            area.style.padding = "10px";
         }
-    });
 
-    // Save edited text back to Supabase
-    async function saveEssay() {
-        const password = prompt("Enter password to save:");
-        if (password !== CONFIG.password) return alert("Incorrect password");
+        // 3. Save directly to Supabase
+        async function saveEssay() {
+            const area = document.getElementById('essay-content');
+            area.removeAttribute('contenteditable');
+            area.style.outline = "";
 
-        const contentHTML = document.getElementById('essay-content').innerHTML;
-        const { error } = await supabaseClient
-            .from('portfolio_data')
-            .upsert({ id: ESSAY_ID, content: contentHTML });
+            const contentHTML = area.innerHTML;
+            const { error } = await supabaseClient
+                .from('portfolio_data')
+                .upsert({ id: ESSAY_ID, content: contentHTML });
 
-        if (error) alert("Error: " + error.message);
-        else alert("Essay saved live to database!");
-    }
-</script>
+            if (error) {
+                alert("Error saving: " + error.message);
+            } else {
+                alert("Essay saved live to database!");
+            }
+        }
+    </script>
 </body>
 </html>
