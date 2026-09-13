@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Y12 English Portfolio Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <style>
         body { 
             font-family: system-ui, -apple-system, sans-serif; 
@@ -24,24 +25,78 @@
             font-weight: 500;
         }
         .essay-list a:hover { text-decoration: underline; }
+        .controls { 
+            position: fixed; 
+            bottom: 20px; 
+            right: 20px; 
+        }
+        button { 
+            padding: 10px 15px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            color: white; 
+            font-weight: 600;
+            background: #2b6cb0;
+        }
     </style>
 </head>
 <body>
 
     <main>
         <h1>Year 12 English Blog Hub</h1>
-        <p>Select an essay or topic below:</p>
+        <p>Select an essay to read or edit:</p>
         
-        <div class="essay-list">
-            <!-- EXISTING LINK -->
-            <a href="essay.html?id=history_of_fashion">📄 History of Fashion</a>
-            
-            <!-- ADD NEW SUBHEADINGS/ESSAYS HERE -->
-            <!-- Format: href="essay.html?id=UNIQUE_ID" -->
-            <a href="essay.html?id=language_and_identity">📄 Language and Identity</a>
-            <a href="essay.html?id=media_analysis">📄 Media Analysis</a>
+        <div id="essay-list" class="essay-list">
+            <p>Loading essays...</p>
         </div>
     </main>
 
+    <div class="controls">
+        <button onclick="createNewPost()">➕ New Post</button>
+    </div>
+
+    <script>
+        const CONFIG = { password: 'englishlanguage123' };
+        const SUPABASE_URL = 'https://ltayjvtqpoapgxxhhiwm.supabase.co'; 
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0YXlqdnRxcG9hcGd4eGhoaXdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDUwNDYsImV4cCI6MjEwNDg4MTA0Nn0.NvUJ3n-9dRIuNEriKa0YTNp3sZA9YTScxQrksfEchCI';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Fetch all saved essays from Supabase table automatically
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data, error } = await supabaseClient
+                .from('portfolio_data')
+                .select('id');
+
+            const container = document.getElementById('essay-list');
+
+            if (error || !data || data.length === 0) {
+                container.innerHTML = '<p>No essays found yet. Click "+ New Post" to add one!</p>';
+                return;
+            }
+
+            // Filter out system layout rows if present
+            const posts = data.filter(row => row.id !== 'hub_layout');
+
+            container.innerHTML = posts.map(post => {
+                const title = post.id.replace(/_/g, ' ').toUpperCase();
+                return `<a href="essay.html?id=${post.id}">📄 ${title}</a>`;
+            }).join('');
+        });
+
+        // Prompt to create a new page dynamically
+        function createNewPost() {
+            if (prompt("Enter password:") !== CONFIG.password) return alert("Incorrect password");
+            
+            const title = prompt("Enter the title for the new post:");
+            if (!title) return;
+
+            // Convert title to a clean URL ID (e.g. "My Weekly Reflection" -> "my_weekly_reflection")
+            const postID = title.toLowerCase().replace(/[^a-z0-0]/g, '_').replace(/_+/g, '_');
+
+            // Redirect straight to the new page master template
+            window.location.href = `essay.html?id=${postID}`;
+        }
+    </script>
 </body>
 </html>
