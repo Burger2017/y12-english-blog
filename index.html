@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Y12 English Portfolio Hub</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <style>
         body { 
             font-family: system-ui, -apple-system, sans-serif; 
@@ -25,89 +24,24 @@
             font-weight: 500;
         }
         .essay-list a:hover { text-decoration: underline; }
-        #hub-content { min-height: 150px; }
-        .controls { 
-            position: fixed; 
-            bottom: 20px; 
-            right: 20px; 
-            display: flex; 
-            gap: 10px; 
-        }
-        button { 
-            padding: 10px 15px; 
-            border: none; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            color: white; 
-            font-weight: 600;
-        }
     </style>
 </head>
 <body>
 
-    <!-- Main Hub Content -->
-    <main id="hub-content">
+    <main>
         <h1>Year 12 English Blog Hub</h1>
-        <p>Select an essay below to read or edit:</p>
+        <p>Select an essay or topic below:</p>
         
         <div class="essay-list">
+            <!-- EXISTING LINK -->
             <a href="essay.html?id=history_of_fashion">📄 History of Fashion</a>
+            
+            <!-- ADD NEW SUBHEADINGS/ESSAYS HERE -->
+            <!-- Format: href="essay.html?id=UNIQUE_ID" -->
+            <a href="essay.html?id=language_and_identity">📄 Language and Identity</a>
+            <a href="essay.html?id=media_analysis">📄 Media Analysis</a>
         </div>
     </main>
 
-    <!-- Floating Live Controls -->
-    <div class="controls">
-        <button onclick="enableEditing()" style="background: #1a202c;">✏️ Live Edit</button>
-        <button onclick="saveHub()" style="background: #2b6cb0;">💾 Save & Sync</button>
-    </div>
-
-    <script>
-        const CONFIG = { password: 'englishlanguage123' };
-        const SUPABASE_URL = 'https://ltayjvtqpoapgxxhhiwm.supabase.co'; 
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0YXlqdnRxcG9hcGd4eGhoaXdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDUwNDYsImV4cCI6MjEwNDg4MTA0Nn0.NvUJ3n-9dRIuNEriKa0YTNp3sZA9YTScxQrksfEchCI';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const HUB_ID = 'hub_layout';
-
-        // Load saved hub structure from database on startup
-        window.addEventListener('DOMContentLoaded', async () => {
-            const { data } = await supabaseClient
-                .from('portfolio_data')
-                .select('content')
-                .eq('id', HUB_ID)
-                .maybeSingle();
-
-            if (data && data.content) {
-                document.getElementById('hub-content').innerHTML = data.content;
-            }
-        });
-
-        // Enable live editing in browser
-        function enableEditing() {
-            if (prompt("Enter password:") !== CONFIG.password) return alert("Incorrect password");
-            const area = document.getElementById('hub-content');
-            area.contentEditable = "true";
-            area.style.outline = "2px dashed #2b6cb0";
-            area.style.padding = "10px";
-            area.style.borderRadius = "6px";
-        }
-
-        // Save live hub layout changes directly to database
-        async function saveHub() {
-            const area = document.getElementById('hub-content');
-            area.removeAttribute('contenteditable');
-            area.style.outline = "";
-            area.style.padding = "";
-
-            const { error } = await supabaseClient
-                .from('portfolio_data')
-                .upsert({ id: HUB_ID, content: area.innerHTML });
-
-            if (error) {
-                alert("Error saving: " + error.message);
-            } else {
-                alert("Hub layout saved live!");
-            }
-        }
-    </script>
 </body>
 </html>
