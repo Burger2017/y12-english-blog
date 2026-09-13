@@ -47,8 +47,8 @@
 </head>
 <body>
 
-    <!-- Back Link (Absolute path targeting your GitHub Pages root) -->
-    <a href="/y12-english-blog/index.html" class="nav-link">← Back to Main Hub</a>
+    <!-- Relative Back Link (Works across any subfolder structure) -->
+    <a href="index.html" class="nav-link">← Back to Main Hub</a>
 
     <!-- Main Content Area -->
     <main id="essay-content">
@@ -68,11 +68,9 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0YXlqdnRxcG9hcGd4eGhoaXdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDUwNDYsImV4cCI6MjEwNDg4MTA0Nn0.NvUJ3n-9dRIuNEriKa0YTNp3sZA9YTScxQrksfEchCI';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Get the essay topic ID from the URL (e.g. ?id=history_of_fashion)
         const urlParams = new URLSearchParams(window.location.search);
         const ESSAY_ID = urlParams.get('id') || 'default_essay';
 
-        // Load content on startup
         window.addEventListener('DOMContentLoaded', async () => {
             const { data } = await supabaseClient
                 .from('portfolio_data')
@@ -83,11 +81,10 @@
             if (data && data.content) {
                 document.getElementById('essay-content').innerHTML = data.content;
             } else {
-                document.getElementById('essay-content').innerHTML = `<h1>New Page (${ESSAY_ID})</h1><p>Click Edit to add content to this essay...</p>`;
+                document.getElementById('essay-content').innerHTML = `<h1>New Page (${ESSAY_ID})</h1><p>Click Edit to write content here...</p>`;
             }
         });
 
-        // Enable live editing in browser
         function enableEditing() {
             if (prompt("Enter password:") !== CONFIG.password) return alert("Incorrect password");
             const area = document.getElementById('essay-content');
@@ -97,7 +94,6 @@
             area.style.borderRadius = "6px";
         }
 
-        // Save live changes to Supabase
         async function saveEssay() {
             const area = document.getElementById('essay-content');
             area.removeAttribute('contenteditable');
