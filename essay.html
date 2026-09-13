@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Essay Reader</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; line-height: 1.6; }
+        #essay-content { min-height: 200px; }
+        .controls { position: fixed; bottom: 20px; right: 20px; display: flex; gap: 10px; }
+        button { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; color: white; }
+    </style>
+</head>
+<body>
+
+    <main id="essay-content">
+        <h1 id="essay-title">Loading...</h1>
+        <div id="essay-body">Select or create an essay to view content.</div>
+    </main>
+
+    <div class="controls">
+        <button onclick="enableEditing()" style="background: #1a202c;">✏️ Edit</button>
+        <button onclick="saveEssay()" style="background: #2b6cb0;">💾 Save Live</button>
+    </div>
+
+    <script>
+        const CONFIG = { password: 'englishlanguage123' };
+        const SUPABASE_URL = 'https://ltayjvtqpoapgxxhhiwm.supabase.co'; 
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0YXlqdnRxcG9hcGd4eGhoaXdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDUwNDYsImV4cCI6MjEwNDg4MTA0Nn0.NvUJ3n-9dRIuNEriKa0YTNp3sZA9YTScxQrksfEchCI';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Automatically gets the essay ID right out of the URL link (e.g., essay.html?id=fashion)
+        const urlParams = new URLSearchParams(window.location.search);
+        const ESSAY_ID = urlParams.get('id') || 'default_essay';
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data } = await supabaseClient
+                .from('portfolio_data')
+                .select('content')
+                .eq('id', ESSAY_ID)
+                .maybeSingle();
+
+            if (data && data.content) {
+                document.getElementById('essay-content').innerHTML = data.content;
+            } else {
+                document.getElementById('essay-content').innerHTML = `<h1>New Page (${ESSAY_ID})</h1><p>Click Edit to write content here...</p>`;
+            }
+        });
+
+        function enableEditing() {
+            if (prompt("Enter password:") !== CONFIG.password) return alert("Incorrect password");
+            const area = document.getElementById('essay-content');
+            area.contentEditable = "true";
+            area.style.outline = "2px dashed #2b6cb0";
+        }
+
+        async function saveEssay() {
+            const area = document.getElementById('essay-content');
+            area.removeAttribute('contenteditable');
+            area.style.outline = "";
+
+            const { error } = await supabaseClient
+                .from('portfolio_data')
+                .upsert({ id: ESSAY_ID, content: area.innerHTML });
+
+            if (error) alert("Error: " + error.message);
+            else alert("Saved live across all devices!");
+        }
+    </script>
+</body>
+</html>
