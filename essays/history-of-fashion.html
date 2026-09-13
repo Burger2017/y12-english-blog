@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The History of Fashion - Essay</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<div class="essay-container">
+    <a href="../index.html" class="back-btn">← Back to Homepage</a>
+
+    <header class="essay-header">
+        <span class="genre-tag informative">Informative Essay</span>
+        <h1 class="essay-title" id="essay-title">The History of Fashion: Brief desc</h1>
+        <p class="essay-meta" id="essay-meta">Published by J • Week 1</p>
+    </header>
+
+    <!-- Writing Start -->
+    <article class="essay-content" id="essay-body">
+        <p>Insert yap here</p>
+        <p>Paragraph 2</p>
+        <p>A third paragraph.</p>
+    </article>
+    <!-- Writing End -->
+</div>
+
+<!-- Floating Controls -->
+<div id="editor-controls" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; gap: 10px;">
+    <button id="edit-btn" onclick="toggleEditMode()" style="padding: 12px 20px; background: #1a202c; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+        ✏️ Local Edit Preview
+    </button>
+    <button id="add-p-btn" onclick="addParagraph()" style="display: none; padding: 12px 20px; background: #2b6cb0; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+        ➕ Add Paragraph
+    </button>
+</div>
+
+<script>
+    const CONFIG = { password: 'englishlanguage123' };
+    const PAGE_KEY = 'saved_essay_history_of_fashion';
+    let isAuthenticated = false;
+
+    // Load saved content automatically when page opens
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedData = localStorage.getItem(PAGE_KEY);
+        if (savedData) {
+            const parsed = JSON.parse(savedData);
+            document.getElementById('essay-title').innerText = parsed.title;
+            document.getElementById('essay-meta').innerText = parsed.meta;
+            document.getElementById('essay-body').innerHTML = parsed.body;
+        }
+    });
+
+    function toggleEditMode() {
+        if (!isAuthenticated) {
+            const input = prompt("Enter password:");
+            if (input === CONFIG.password) {
+                isAuthenticated = true;
+                enableEditing();
+            } else {
+                alert("Incorrect password.");
+            }
+        } else {
+            saveAndDisableEditing();
+        }
+    }
+
+    function enableEditing() {
+        document.querySelectorAll('.essay-title, .essay-meta, .essay-content p').forEach(makeEditable);
+        
+        const btn = document.getElementById('edit-btn');
+        btn.innerText = "💾 Save & Exit";
+        btn.style.backgroundColor = "#2b6cb0";
+
+        document.getElementById('add-p-btn').style.display = "inline-block";
+    }
+
+    function saveAndDisableEditing() {
+        // Remove editable styles
+        document.querySelectorAll('[contenteditable]').forEach(el => {
+            el.removeAttribute('contenteditable');
+            el.style.outline = "";
+            el.style.padding = "";
+            el.style.backgroundColor = "";
+        });
+
+        // Save current HTML structure to browser memory
+        const dataToSave = {
+            title: document.getElementById('essay-title').innerText,
+            meta: document.getElementById('essay-meta').innerText,
+            body: document.getElementById('essay-body').innerHTML
+        };
+        localStorage.setItem(PAGE_KEY, JSON.stringify(dataToSave));
+
+        const btn = document.getElementById('edit-btn');
+        btn.innerText = "✏️ Local Edit Preview";
+        btn.style.backgroundColor = "#1a202c";
+
+        document.getElementById('add-p-btn').style.display = "none";
+        isAuthenticated = false;
+    }
+
+    function makeEditable(el) {
+        el.contentEditable = "true";
+        el.style.outline = "2px dashed #2b6cb0";
+        el.style.padding = "4px";
+        el.style.backgroundColor = "#fffde7";
+    }
+
+    function addParagraph() {
+        if (!isAuthenticated) return;
+        
+        const container = document.getElementById('essay-body');
+        const newP = document.createElement('p');
+        newP.innerText = "Type your new paragraph content here...";
+        
+        container.appendChild(newP);
+        makeEditable(newP);
+    }
+</script>
+
+</body>
+</html>

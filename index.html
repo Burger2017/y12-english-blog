@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Y12 English Language Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>English Language Portfolio</h1>
+        <p>Year 12 A-Level Collaborative Writing</p>
+    </header>
+
+    <main class="hub-container" id="hub-container">
+        
+        <!-- MAIN HEADING 1: FASHION -->
+        <section class="topic-section">
+            <h2 class="main-heading">Fashion</h2>
+            <p class="topic-description">PLACEHOLDER</p>
+            
+            <ul class="essay-links-list">
+                <li>
+                    <a href="essays/history-of-fashion.html" class="sub-heading-link">
+                        <span class="genre-tag">Informative</span>
+                        <strong>The History of Fashion:</strong>
+                        <span class="essay-desc">Brief desc</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="essays/fast-fashion.html" class="sub-heading-link">
+                        <span class="genre-tag">Opinion</span>
+                        <strong>Title:</strong>
+                        <span class="essay-desc">Brief desc</span>
+                    </a>
+                </li>
+            </ul>
+        </section>
+
+         <!-- MAIN HEADING 2: WIP -->
+        <section class="topic-section">
+            <h2 class="main-heading">WIP</h2>
+            <p class="topic-description">PLACEHOLDER</p>
+
+            <ul class="essay-links-list">
+                <li>
+                    <a href="essays/placeholder.html" class="sub-heading-link">
+                        <span class="genre-tag">Argumentative</span>
+                        <strong>Title:</strong>
+                        <span class="essay-desc">Brief desc</span>
+                    </a>
+                </li>
+            </ul>
+        </section>
+
+    </main>
+
+    <!-- Floating Controls -->
+    <div id="editor-controls" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; gap: 10px;">
+        <button id="edit-btn" onclick="toggleEditMode()" style="padding: 12px 20px; background: #1a202c; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+            ✏️ Local Edit Preview
+        </button>
+        <button id="add-section-btn" onclick="addMainHeading()" style="display: none; padding: 12px 20px; background: #2b6cb0; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+            ➕ Add Main Heading
+        </button>
+    </div>
+
+    <script>
+        const CONFIG = { password: 'englishlanguage123' };
+        const HUB_KEY = 'saved_hub_content';
+        let isAuthenticated = false;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedData = localStorage.getItem(HUB_KEY);
+            if (savedData) {
+                document.getElementById('hub-container').innerHTML = savedData;
+            }
+        });
+
+        function toggleEditMode() {
+            if (!isAuthenticated) {
+                const input = prompt("Enter password:");
+                if (input === CONFIG.password) {
+                    isAuthenticated = true;
+                    enableEditing();
+                } else {
+                    alert("Incorrect password.");
+                }
+            } else {
+                saveAndDisableEditing();
+            }
+        }
+
+        function enableEditing() {
+            document.querySelectorAll('.sub-heading-link').forEach(link => {
+                if (link.hasAttribute('href')) {
+                    link.setAttribute('data-target-href', link.getAttribute('href'));
+                    link.removeAttribute('href');
+                }
+            });
+
+            document.querySelectorAll('.main-heading, .topic-description, .genre-tag, .sub-heading-link strong, .essay-desc').forEach(makeEditable);
+
+            document.querySelectorAll('.topic-section').forEach(section => {
+                if (!section.querySelector('.add-link-btn')) {
+                    const addLinkBtn = document.createElement('button');
+                    addLinkBtn.className = 'add-link-btn';
+                    addLinkBtn.innerText = '➕ Add Essay Subheading';
+                    addLinkBtn.style.cssText = 'margin-top: 15px; padding: 6px 12px; background: #edf2f7; color: #2d3748; border: 1px solid #cbd5e0; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: bold; display: block;';
+                    addLinkBtn.onclick = () => addSubHeading(section);
+                    section.appendChild(addLinkBtn);
+                }
+            });
+            
+            const btn = document.getElementById('edit-btn');
+            btn.innerText = "💾 Save & Exit";
+            btn.style.backgroundColor = "#2b6cb0";
+
+            document.getElementById('add-section-btn').style.display = "inline-block";
+        }
+
+        function saveAndDisableEditing() {
+            document.querySelectorAll('.sub-heading-link').forEach(link => {
+                const target = link.getAttribute('data-target-href') || 'essays/placeholder.html';
+                link.setAttribute('href', target);
+                link.removeAttribute('data-target-href');
+            });
+
+            document.querySelectorAll('.add-link-btn').forEach(btn => btn.remove());
+            
+            document.querySelectorAll('[contenteditable]').forEach(el => {
+                el.removeAttribute('contenteditable');
+                el.style.outline = "";
+                el.style.padding = "";
+                el.style.backgroundColor = "";
+            });
+
+            const containerHTML = document.getElementById('hub-container').innerHTML;
+            localStorage.setItem(HUB_KEY, containerHTML);
+
+            const btn = document.getElementById('edit-btn');
+            btn.innerText = "✏️ Local Edit Preview";
+            btn.style.backgroundColor = "#1a202c";
+
+            document.getElementById('add-section-btn').style.display = "none";
+            isAuthenticated = false;
+        }
+
+        function makeEditable(el) {
+            el.contentEditable = "true";
+            el.style.outline = "2px dashed #2b6cb0";
+            el.style.padding = "2px 4px";
+            el.style.backgroundColor = "#fffde7";
+        }
+
+        function addMainHeading() {
+            if (!isAuthenticated) return;
+
+            const container = document.getElementById('hub-container');
+            const newSection = document.createElement('section');
+            newSection.className = 'topic-section';
+            
+            newSection.innerHTML = `
+                <h2 class="main-heading">New Category Heading</h2>
+                <p class="topic-description">Category description here...</p>
+                <ul class="essay-links-list">
+                    <li>
+                        <a data-target-href="essays/placeholder.html" class="sub-heading-link">
+                            <span class="genre-tag">Informative</span>
+                            <strong>New Essay Title:</strong>
+                            <span class="essay-desc">Brief description</span>
+                        </a>
+                    </li>
+                </ul>
+            `;
+
+            container.appendChild(newSection);
+            newSection.querySelectorAll('.main-heading, .topic-description, .genre-tag, .sub-heading-link strong, .essay-desc').forEach(makeEditable);
+            
+            const addLinkBtn = document.createElement('button');
+            addLinkBtn.className = 'add-link-btn';
+            addLinkBtn.innerText = '➕ Add Essay Subheading';
+            addLinkBtn.style.cssText = 'margin-top: 15px; padding: 6px 12px; background: #edf2f7; color: #2d3748; border: 1px solid #cbd5e0; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: bold; display: block;';
+            addLinkBtn.onclick = () => addSubHeading(newSection);
+            newSection.appendChild(addLinkBtn);
+        }
+
+        function addSubHeading(sectionElement) {
+            if (!isAuthenticated) return;
+
+            const list = sectionElement.querySelector('.essay-links-list');
+            const newLi = document.createElement('li');
+
+            newLi.innerHTML = `
+                <a data-target-href="essays/placeholder.html" class="sub-heading-link">
+                    <span class="genre-tag">Opinion</span>
+                    <strong>New Title:</strong>
+                    <span class="essay-desc">Brief description</span>
+                </a>
+            `;
+
+            list.appendChild(newLi);
+            newLi.querySelectorAll('.genre-tag, strong, .essay-desc').forEach(makeEditable);
+        }
+    </script>
+</body>
+</html>
