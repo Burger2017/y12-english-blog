@@ -2,22 +2,60 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Essay Reader</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; line-height: 1.6; }
-        #essay-content { min-height: 200px; }
-        .controls { position: fixed; bottom: 20px; right: 20px; display: flex; gap: 10px; }
-        button { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; color: white; }
+        body { 
+            font-family: system-ui, -apple-system, sans-serif; 
+            max-width: 800px; 
+            margin: 40px auto; 
+            padding: 0 20px; 
+            line-height: 1.6; 
+            color: #2d3748;
+        }
+        .nav-link {
+            display: inline-block;
+            margin-bottom: 24px;
+            text-decoration: none;
+            color: #2b6cb0;
+            font-weight: 600;
+        }
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+        #essay-content { 
+            min-height: 200px; 
+        }
+        .controls { 
+            position: fixed; 
+            bottom: 20px; 
+            right: 20px; 
+            display: flex; 
+            gap: 10px; 
+        }
+        button { 
+            padding: 10px 15px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            color: white; 
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
-<a href="index.html" style="display: inline-block; margin-bottom: 20px; text-decoration: none; color: #2b6cb0; font-weight: bold;">← Back to Main Hub</a>
+
+    <!-- Back to Main Hub Navigation Button -->
+    <a href="index.html" class="nav-link">← Back to Main Hub</a>
+
+    <!-- Main Content Wrapper -->
     <main id="essay-content">
         <h1 id="essay-title">Loading...</h1>
         <div id="essay-body">Select or create an essay to view content.</div>
     </main>
 
+    <!-- Floating Live Controls -->
     <div class="controls">
         <button onclick="enableEditing()" style="background: #1a202c;">✏️ Edit</button>
         <button onclick="saveEssay()" style="background: #2b6cb0;">💾 Save Live</button>
@@ -29,10 +67,11 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0YXlqdnRxcG9hcGd4eGhoaXdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDUwNDYsImV4cCI6MjEwNDg4MTA0Nn0.NvUJ3n-9dRIuNEriKa0YTNp3sZA9YTScxQrksfEchCI';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Automatically gets the essay ID right out of the URL link (e.g., essay.html?id=fashion)
+        // Extracts the unique topic ID from the URL string
         const urlParams = new URLSearchParams(window.location.search);
         const ESSAY_ID = urlParams.get('id') || 'default_essay';
 
+        // Load dynamic data on browser initialization
         window.addEventListener('DOMContentLoaded', async () => {
             const { data } = await supabaseClient
                 .from('portfolio_data')
@@ -47,24 +86,32 @@
             }
         });
 
+        // Unlocks client-side inline editing
         function enableEditing() {
             if (prompt("Enter password:") !== CONFIG.password) return alert("Incorrect password");
             const area = document.getElementById('essay-content');
             area.contentEditable = "true";
             area.style.outline = "2px dashed #2b6cb0";
+            area.style.padding = "10px";
+            area.style.borderRadius = "6px";
         }
 
+        // Writes changes dynamically to Supabase
         async function saveEssay() {
             const area = document.getElementById('essay-content');
             area.removeAttribute('contenteditable');
             area.style.outline = "";
+            area.style.padding = "";
 
             const { error } = await supabaseClient
                 .from('portfolio_data')
                 .upsert({ id: ESSAY_ID, content: area.innerHTML });
 
-            if (error) alert("Error: " + error.message);
-            else alert("Saved live across all devices!");
+            if (error) {
+                alert("Error saving: " + error.message);
+            } else {
+                alert("Saved live! This essay is now synced across all devices.");
+            }
         }
     </script>
 </body>
